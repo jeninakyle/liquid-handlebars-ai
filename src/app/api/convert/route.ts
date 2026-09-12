@@ -2,8 +2,6 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI();
-
 const ConversionResult = z.object({
     template: z.string(),
     warnings: z.array(z.string()),
@@ -11,6 +9,17 @@ const ConversionResult = z.object({
 });
 
 export async function POST(request: Request) {
+    if (!process.env.OPENAI_API_KEY) {
+        return Response.json(
+          { error: "OpenAI API configuration is missing." },
+          { status: 500 }
+        );
+      }
+    
+    const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const body = await request.json();
 
     if (!body.template?.trim()) {
