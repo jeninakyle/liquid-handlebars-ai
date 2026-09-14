@@ -54,6 +54,20 @@ export async function POST(request: Request) {
                 -Record meaningful conversions in the changes array.
 
                 SPECIFIC RULES
+                -For every Handlebars block opened with {{#helperName ...}}, close it with {{/helperName}}. 
+                Example:
+                {{#unless customer.status}}
+                ...
+                {{/unless}}
+                Example:
+                {{#ifEq customer.status "active"}}
+                ...
+                {{/ifEq}}
+                Example:
+                {{#ifGt index 1}}
+                ...
+                {{/ifGt}}
+                Make sure that there is a matching closing block for every opened ones.
                 -Remove all Liquid content blocks from the converted template. Do not convert or preserve them. For every removed Liquid content block, add an entry to the changes array describing what was removed.
                 -Identify all data variables and attributes referenced in the source template. Do not include content blocks. 
                 Some data will look like below:
@@ -80,7 +94,6 @@ export async function POST(request: Request) {
                 {% assign firstName = customer.first_name %}
                 becomes
                 {{#assign "firstName"}}{{customer.first_name}}{{/assign}}
-                -For every Handlebars block opened with {{#helperName ...}}, close it with {{/helperName}}.
                 -Do not use the helper or subexpression "notEq".
                 Use "neq" for not-equal comparisons.
                 Example:
