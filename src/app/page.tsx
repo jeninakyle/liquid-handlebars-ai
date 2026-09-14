@@ -7,7 +7,7 @@ export default function Home() {
   const [sourceTemplate, setSourceTemplate] = useState("");
   const [convertedTemplate, setConvertedTemplate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [changes, setChanges] = useState<string[]>([]);
 
@@ -17,7 +17,8 @@ export default function Home() {
     }
 
     setIsLoading(true);
-    setError("");
+    setConvertedTemplate("");
+    setErrors([]);
     setWarnings([]);
     setChanges([]);
 
@@ -35,13 +36,14 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Something went wrong.");
+        setErrors([data.error || "Something went wrong."]);
         return;
       }
 
       setConvertedTemplate(data.template);
-      setWarnings(data.warnings);
-      setChanges(data.changes);
+      setErrors(data.errors ?? []);
+      setWarnings(data.warnings ?? []);
+      setChanges(data.changes ?? []);
     } finally {
       setIsLoading(false);
     }
@@ -85,34 +87,40 @@ export default function Home() {
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div>
-            <h2 className="mb-2 text-sm font-semibold text-zinc-800">
-              Changes
-          </h2>
-          {changes.length > 0 ? (
-            <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700">
-            {changes.map((change, index) => (
-              <li key={index}>{change}</li>
-              ))}
-              </ul>
-              ) : (
-              <p className="text-sm text-zinc-500">No changes reported.</p>
-              )}
-          </div>
-          <div>
-            <h2 className="mb-2 text-sm font-semibold text-zinc-800">
-              Warnings
-            </h2>
-            {warnings.length > 0 ? (
-              <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700">
-              {warnings.map((warning, index) => (
-                <li key={index}>{warning}</li>
-              ))}
-              </ul>
-              ) : (
-              <p className="text-sm text-zinc-500">No warnings.</p>
+            {changes.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Changes</h3>
+                <ul className="list-disc pl-5">
+                  {changes.map((change, index) => (
+                    <li key={index}>{change}</li>
+                  ))}
+                </ul>
+              </div>
             )}
-          </div>
-        </div>        
+
+            {errors.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Errors</h3>
+                <ul className="list-disc pl-5">
+                  {errors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {warnings.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-semibold">Warnings</h3>
+                <ul className="list-disc pl-5">
+                  {warnings.map((warning, index) => (
+                    <li key={index}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div> 
+        </div>       
         <div className="mt-6 flex justify-end">
           <button
             onClick={handleConvert}
