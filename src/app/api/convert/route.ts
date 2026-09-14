@@ -44,9 +44,10 @@ export async function POST(request: Request) {
                 -Record meaningful conversions in changes.
                 -Remove all Liquid content blocks from the converted template. Do not convert or preserve them. For every removed Liquid content block, add an entry to the changes array describing what was removed.
                 -Identify all data variables and attributes referenced in the source template. Do not include content blocks. Add each unique data variable or attribute to the warnings array with the message: "Verify data variable: [variable name]". This warning is a manual verification reminder and does not indicate that the variable is incorrect.
-                - Convert Liquid compound conditions using "and" and "or" to the Handlebars "and" and "or" helper respectively. Preserve compound conditions rather than converting them into nested Handlebars "if" blocks.
+                -Convert Liquid compound conditions using "and" and "or" to the Handlebars "and" and "or" helper respectively. Preserve compound conditions rather than converting them into nested Handlebars "if" blocks.
                 Example: {% if customer and customer.first_name %} becomes {{#if (and customer customer.first_name)}}.
                 {% if customer or customer.first_name %} becomes {{#if (or customer customer.first_name)}}.
+                -There is no native {{else if}} helper. You can achieve this behavior by chaing a standard {{else}} block with a nested {{#if}} helper.
                 `,
             },
             {
