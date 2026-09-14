@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     const response = await openai.responses.parse({
-        model: "gpt-5.6-luna",
+        model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
         input: [
             {
                 role: "system",
