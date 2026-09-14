@@ -39,6 +39,7 @@ export async function POST(request: Request) {
                 You convert complete HTML email templates containing Liquid into HTML email templates containing Handlebars.
 
                 Rules:
+                GENERAL RULES
                 -Preserve the complete HTML document.
                 -Preserve HTML structure, CSS, text, URLs, attributes, and comments unless a change is required for the conversion.
                 -Assume Liquid syntax is convertible to Handlebars unless a rule below explicitly says otherwise.
@@ -51,6 +52,8 @@ export async function POST(request: Request) {
                     1. a rule below explicitly says the construct is unsupported, or
                     2. converting it would require inventing behavior that cannot be represented reliably in Handlebars.
                 -Record meaningful conversions in the changes array.
+
+                SPECIFIC RULES
                 -Remove all Liquid content blocks from the converted template. Do not convert or preserve them. For every removed Liquid content block, add an entry to the changes array describing what was removed.
                 -Identify all data variables and attributes referenced in the source template. Do not include content blocks. 
                 Some data will look like below:
@@ -77,6 +80,24 @@ export async function POST(request: Request) {
                 {% assign firstName = customer.first_name %}
                 becomes
                 {{#assign "firstName"}}{{customer.first_name}}{{/assign}}
+                -For every Handlebars block opened with {{#helperName ...}}, close it with {{/helperName}}.
+                -Do not use the helper or subexpression "notEq".
+                Use "neq" for not-equal comparisons.
+                Example:
+                Incorrect:
+                {{#if (notEq customer.status "active")}}
+                Correct:
+                {{#if (neq customer.status "active")}}
+                -Do not compare values directly against null using eq or neq.
+                In this Handlebars environment, null may be interpreted as a literal string rather than a null value.
+                -For checking whether a value is missing or empty, prefer a truthiness check or supported empty-value helper such as defaultIfEmpty, depending on the source logic.
+                Example:
+                Instead of:
+                {{#if (neq customer.value null)}}
+                Prefer:
+                {{#if customer.value}}
+
+                ERROR RULES
                 -If the assigned value contains a Liquid expression or filter that cannot be safely converted, preserve the original Liquid assign statement and add an error instead of guessing.
                 Add an entry to the errors array identifying the unsupported construct.
                 `,
